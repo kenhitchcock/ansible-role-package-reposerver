@@ -19,14 +19,14 @@ Most variables required for this role to run are currently set in the defaults d
 Example Playbook
 ----------------
 
-- name: "Build Repo server" 
-  hosts: reposerver  
-  become: true
+    - name: "Build Repo server" 
+      hosts: reposerver  
+      become: true
 
-  tasks:
-    - name: "Include role"
-      include_role:
-        name: ../roles/ansible-role-package-reposerver
+      tasks:
+        - name: "Include role"
+          include_role:
+          name: ../roles/ansible-role-package-reposerver
 
 
 License
