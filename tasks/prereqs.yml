@@ -1,0 +1,47 @@
+---
+
+- name: "Do repo directories exist"
+  stat:
+    path: "{{ item }}"
+  loop: 
+  register: exportpath
+
+- name: "Creates directory if missing"
+  file:
+    path: "{{rh_ocp_export_path}}"
+    state: directory
+  when: 
+    - exportpath.stat.exists == false
+
+- name: "Does the export of core exist already?"
+  stat:
+    path: "{{rh_ocp_export_path_core}}"
+  register: exportpathcore
+
+- name: Get a list of all containers and export
+  shell: |
+    docker save $(docker images | awk 'NR>2 {print last} {last=$1}') -o "{{rh_ocp_export_path_core}}"
+  register: images_list
+  tags:
+    - core
+  when: 
+    - rhexport_images == "yes" 
+    - ocp_images_pull_core == "yes"
+    - exportpathcore.stat.exists == false
+
+- name: "Does the export of apps exist already?"
+  stat:
+    path: "{{rh_ocp_export_path_app}}"
+  register: exportpathapp
+
+- name: Jenkins and Nexus images only for export
+  shell: |
+    docker save $(docker images | egrep "jen|nexus" | awk '{print $3}') -o "{{rh_ocp_export_path_app}}"
+  register: JenkinsNexus
+  tags:
+    - apps
+  when:
+    - rhexport_images == "yes"
+    - ocp_images_pull_app == "yes"
+    - exportpathapp.stat.exists == false
+
