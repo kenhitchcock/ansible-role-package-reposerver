@@ -36,10 +36,11 @@
     - "item.value.reposvr_filetype == 'archive'"
 
 - name: "Create repos in the new extracted directories of rpm files"
-  shell: | 
-          "createrepo \ 
+  shell:
+    cmd: "createrepo \ 
           {{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }} \ 
           -o {{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }}"
+    chdir: "{{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }}"
   with_dict: "{{REPOS}}"
   ignore_errors: true
 
