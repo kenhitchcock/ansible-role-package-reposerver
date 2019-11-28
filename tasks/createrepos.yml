@@ -20,15 +20,38 @@
     dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
     mode: '0755'
   with_dict: "{{REPOS}}"
+  ignore_errors: true
   when: 
     - "item.value.reposvr_useweb == 'yes'"
 
 - name: "Extract Downloaded zip file for Satellite 6_6 workaround"
   unarchive:
     src: "{{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_filename }}"
-    dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+    dest: "{{reporoot}}"
     remote_src: yes
   with_dict: "{{REPOS}}"
+  ignore_errors: true
   when: 
     - "item.value.reposvr_useweb == 'yes'"
     - "item.value.reposvr_filetype == 'archive'"
+
+- name: "Create repos in the new extracted directories of rpm files"
+  shell: | 
+          "createrepo \ 
+          --basedir={{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }} \ 
+          -o {{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }}"
+  with_dict: "{{REPOS}}"
+  ignore_errors: true
+
+# Creates a repo file so the repo server can use itself for package installations.
+- name: "Create Repofile for new repos, all will be added to same file"
+  yum_repository:
+    name: "{{ item.value.reposvr_reponame }}"
+    description: "{{ item.value.reposvr_reponame }}"
+    file: "{{ repofilename }}"
+    baseurl: "file://{{ reporoot }}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }}"
+    gpgcheck: "{{ repogpgcheck }}"
+    enabled: yes
+  with_dict: "{{REPOS}}"
+  ignore_errors: true
+
