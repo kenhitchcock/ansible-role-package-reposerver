@@ -18,7 +18,8 @@ role and dont need to be set.
 
 ```
 # Variables to set
-# This is the location to where repo files will be stored. It is here that repo directories will be created.
+# This is the location to where repo files will be stored. It is here that repo directories 
+# will be created. 
   reporoot: "/var/www/html/repos"
 
 # Dict for repos you wish to create. 
