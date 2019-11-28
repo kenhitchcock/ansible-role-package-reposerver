@@ -1,47 +1,38 @@
 ---
 
-- name: "Do repo directories exist"
-  stat:
-    path: "{{ item }}"
-  loop: 
-  register: exportpath
+- name: "Package installation"
+  yum: 
+    name: "{{item}}"
+  loop: "{{PACKAGES}}"
 
-- name: "Creates directory if missing"
+- name: "Check if main repository directory exists"
+  stat:
+    path: "{{ reporoot }}"
+  register: repospath
+
+- name: "Creates repo root directory if missing"
   file:
-    path: "{{rh_ocp_export_path}}"
+    path: "{{reporoot}}"
     state: directory
   when: 
-    - exportpath.stat.exists == false
+    - repospath.stat.exists == false
 
-- name: "Does the export of core exist already?"
-  stat:
-    path: "{{rh_ocp_export_path_core}}"
-  register: exportpathcore
+- name: 'Ensure firewalld is running'
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
 
-- name: Get a list of all containers and export
-  shell: |
-    docker save $(docker images | awk 'NR>2 {print last} {last=$1}') -o "{{rh_ocp_export_path_core}}"
-  register: images_list
-  tags:
-    - core
-  when: 
-    - rhexport_images == "yes" 
-    - ocp_images_pull_core == "yes"
-    - exportpathcore.stat.exists == false
+- name: 'Open Firewall for repo use'
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  with_items:
+  - http
+  - https 
+  - ssh
 
-- name: "Does the export of apps exist already?"
-  stat:
-    path: "{{rh_ocp_export_path_app}}"
-  register: exportpathapp
 
-- name: Jenkins and Nexus images only for export
-  shell: |
-    docker save $(docker images | egrep "jen|nexus" | awk '{print $3}') -o "{{rh_ocp_export_path_app}}"
-  register: JenkinsNexus
-  tags:
-    - apps
-  when:
-    - rhexport_images == "yes"
-    - ocp_images_pull_app == "yes"
-    - exportpathapp.stat.exists == false
 

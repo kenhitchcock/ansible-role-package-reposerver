@@ -1,8 +1,8 @@
 ---
 
 - block:
-    - name: "Prereqs"
-      include_tasks: prereqs.yml
+  #  - name: "Prereqs"
+  #    include_tasks: prereqs.yml
 
     - name: "Create local repos"
       include_tasks: createrepos.yml

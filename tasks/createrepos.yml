@@ -1,50 +1,34 @@
 ---
 
-- name: "Login to Red Hat container Registry"
-  shell: | 
-         docker login -u "{{rhreg_user}}" -p "{{rhreg_pass}}" "{{rhreg_name}}"
-  when:
-    - rhreg_user is defined
-    - rhreg_pass is defined
-    - rhreg_name is defined
 
-- name: "Pull oscp images from registry.redhat.io"
-  shell: |
-         docker pull "{{ item }}"
-  with_items: "{{ core_oscp_images }}"
-  when:
-    - 'ocp_images_pull_core == "yes"'
+- name: "Do repo directories exist"
+  stat:
+    path: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+  with_dict: "{{REPOS}}"
+  register: "repodirs"
 
-- name: "Pull oscp application images from registry.redhat.io and docker(nexus)"
-  shell: |
-         docker pull "{{ item }}"
-  with_items: "{{ application_oscp_images }}"
-  when:
-    - 'ocp_images_pull_app == "yes"'
+- name: "Create missing repo directories"
+  file:
+    path: "{{reporoot}}/{{ item.item.value.reposvr_repodir }}"
+    state: directory
+  with_items: "{{ repodirs.results }}"
+  when: item.stat.exists == false
 
-- name: "Pull optional oscp images from registry.redhat.io"
-  shell: |
-         docker pull "{{ item }}"
-  with_items: "{{ optional_oscp_images }}"
-  when:
-    - 'ocp_images_pull_opt == "yes"'
+- name: "Copy Files to each repo location"
+  get_url:
+    url: "{{ item.value.reposvr_webloc }}/{{ item.value.reposvr_filename }}"
+    dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+    mode: '0755'
+  with_dict: "{{REPOS}}"
+  when: 
+    - "item.value.reposvr_useweb == 'yes'"
 
-
-# When docker is included by default with ansible we can use these.
-#- name: Pull oscp images from registry.redhat.io
-#  docker_image:
-#    name: "{{ item }}"
-#  state: present
-#  with_items: "{{ core_oscp_images }}"
-
-#- name: Pull oscp application images from registry.redhat.io and docker(nexus)
-#  docker_image:
-#    name: "{{ item }}"
-#    state: present
-#  with_items: "{{ application_oscp_images }}"
-
-#- name: Pull optional oscp images from registry.redhat.io
-#  docker_image:
-#    name: "{{ item }}"
-#  state: present
-#  with_items: "{{ optional_oscp_images }}"
+- name: "Extract Downloaded zip file for Satellite 6_6 workaround"
+  unarchive:
+    src: "{{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_filename }}"
+    dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+    remote_src: yes
+  with_dict: "{{REPOS}}"
+  when: 
+    - "item.value.reposvr_useweb == 'yes'"
+    - "item.value.reposvr_filetype == 'archive'"
