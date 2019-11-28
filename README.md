@@ -10,8 +10,8 @@ Requirements
 Registered to satellite or CDN, failing that, a ISO with packages will need to be mounted and a repo configured.
 
 
-Role Variables
---------------
+package-reposerver
+------------------
 
 Most variables required for this role to run are currently set in the defaults directory of the 
 role and dont need to be set. 
