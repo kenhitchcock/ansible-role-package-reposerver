@@ -27,7 +27,7 @@
 - name: "Extract Downloaded zip file for Satellite 6_6 workaround"
   unarchive:
     src: "{{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_filename }}"
-    dest: "{{reporoot}}"
+    dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
     remote_src: yes
   with_dict: "{{REPOS}}"
   ignore_errors: true
@@ -38,7 +38,7 @@
 - name: "Create repos in the new extracted directories of rpm files"
   shell: | 
           "createrepo \ 
-          --basedir={{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }} \ 
+          {{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }} \ 
           -o {{reporoot}}/{{ item.value.reposvr_repodir }}/{{ item.value.reposvr_extracteddir }}"
   with_dict: "{{REPOS}}"
   ignore_errors: true
