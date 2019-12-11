@@ -4,6 +4,7 @@
 reporoot: "/var/www/html/repos"
 repofilename: "custom_repos"
 repogpgcheck : no
+unregisterreposvr: yes
 
 REPOS:
   RHEL7RPMS:

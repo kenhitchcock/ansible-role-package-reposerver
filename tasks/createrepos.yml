@@ -56,3 +56,8 @@
   with_dict: "{{REPOS}}"
   ignore_errors: true
 
+- name: "Unregister system after repos have been created."
+  redhat_subscription:
+    state: absent
+  when: 
+    - unregisterreposvr == 'yes'

@@ -1,4 +1,4 @@
-Role Name
+package-reposerver
 =========
 
 name: ansible-role-package-reposerver
@@ -9,22 +9,19 @@ Requirements
 
 Registered to satellite or CDN, failing that, a ISO with packages will need to be mounted and a repo configured.
 
-
-package-reposerver
-------------------
-
+Role Variables
+--------------
 Most variables required for this role to run are currently set in the defaults directory of the 
 role and dont need to be set. 
 
-```
-# Variables to set
-# This is the location to where repo files will be stored. It is here that repo directories 
-# will be created. 
-  reporoot: "/var/www/html/repos"
+| Variable | Description | Required | Defaults |
+|:---------|:------------|:---------|:---------|
+|reporoot| Path to the where repos will be exposed via httpd | yes | "/var/www/html/repos"|
+|REPOS| Dictionary of repos to build and provide, example below | yes | |
+|reposvr_filetype|accepts archive, iso for now|yes||
+|reposvr_useweb|Used to determine how files will be transfered to system|yes||
 
-# Dict for repos you wish to create. 
-# reposvr_filetype accepts archive, iso for now
-# reposvr_useweb accepts yes or no, this is to distinguish which file transfer method is to be used.
+```
   REPOS:
     RHEL7RPMS:
       reposvr_filename: "rhel77.zip"
