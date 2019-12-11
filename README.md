@@ -21,7 +21,7 @@ role and dont need to be set.
 |reposvr_filetype|accepts archive, iso for now|yes||
 |reposvr_useweb|Used to determine how files will be transfered to system|yes||
 
-# Example of disctionary of RPM repos to build
+##Example of disctionary of RPM repos to build
 ```
   REPOS:
     RHEL7RPMS:
