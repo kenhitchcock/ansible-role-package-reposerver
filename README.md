@@ -24,7 +24,7 @@ role and dont need to be set.
 |FIREWALL_SERVICES|Firewall services to open in the firewall, NOT ports for now.|yes|http,https,ssh|
 |REPOS| Dictionary of repos to build and provide, example below | yes | |
 |reposvr_filetype|accepts archive, iso for now|yes||
-|reposvr_useweb|Used to determine how files will be transfered to system|yes||
+|reposvr_syncmeth|Used to determine how files will be transfered to system, accepted options are 'web','file' and 'sync'|yes||
 
 ### Example dictionary of RPM repos to build
 ```
@@ -32,11 +32,20 @@ role and dont need to be set.
     RHEL7RPMS:
       reposvr_filename: "rhel77.zip"
       reposvr_filetype: "archive"
-      reposvr_webloc: "http://192.168.122.1/rhel77/OS"
+      reposvr_webloc: "http://192.168.122.1/rhel77/"
       reposvr_fileloc: "files/"
-      reposvr_useweb: "yes"
+      reposvr_syncmeth: "web"
       reposvr_repodir: "rhel7"
       reposvr_reponame: "rhel7"
+    CDNRHEL7HARPMS:
+      reposvr_filename: "rhel-ha-for-rhel-7-server-rpms"
+      reposvr_filetype: ""
+      reposvr_extracteddir: ""
+      reposvr_webloc: ""
+      reposvr_fileloc: ""
+      reposvr_syncmeth: "sync"
+      reposvr_repodir: "rhel7-ha"
+      reposvr_reponame: "rhel7-ha-for-rhel7-server-rpms"
 ```
 Example Playbook
 ----------------

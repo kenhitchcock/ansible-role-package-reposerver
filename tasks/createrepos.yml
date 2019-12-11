@@ -1,6 +1,4 @@
 ---
-
-
 - name: "Do repo directories exist"
   stat:
     path: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
@@ -14,7 +12,7 @@
   with_items: "{{ repodirs.results }}"
   when: item.stat.exists == false
 
-- name: "Copy Files to each repo location"
+- name: "Copy Files to each repo location from web server."
   get_url:
     url: "{{ item.value.reposvr_webloc }}/{{ item.value.reposvr_filename }}"
     dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
@@ -22,7 +20,17 @@
   with_dict: "{{REPOS}}"
   ignore_errors: true
   when: 
-    - "item.value.reposvr_useweb == 'yes'"
+    - "item.value.reposvr_syncmeth == 'web'"
+
+- name: "Copy Files to each repo location using file transfer."
+  copy:
+    src: "{{ item.value.reposvr_fileloc }}/{{ item.value.reposvr_filename }}"
+    dest: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+    mode: '0755'
+  with_dict: "{{REPOS}}"
+  ignore_errors: true
+  when: 
+    - "item.value.reposvr_syncmeth == 'file'"
 
 - name: "Extract Downloaded zip file for each repo"
   unarchive:
@@ -33,6 +41,16 @@
   ignore_errors: true
   when: 
     - "item.value.reposvr_filetype == 'archive'"
+    - "item.value.reposvr_syncmeth == 'file' or item.value.reposvr_syncmeth == 'web'"
+
+- name: "Sync content using reposync"
+  shell: 
+    cmd: "reposync --gpgcheck -l --repoid={{ item.value.reposvr_filename }} --download_path={{reporoot}}/{{ item.value.reposvr_repodir }}"
+    chdir: "{{reporoot}}/{{ item.value.reposvr_repodir }}"
+  with_dict: "{{REPOS}}"
+  ignore_errors: true
+  when: 
+    - "item.value.reposvr_syncmeth == 'sync'"
 
 # Using a shell for the createrepo command as there is no ansible module for it.
 - name: "Create repos in the new extracted directories of rpm files"
@@ -55,9 +73,9 @@
     enabled: yes
   with_dict: "{{REPOS}}"
   ignore_errors: true
-
+  
 - name: "Unregister system after repos have been created."
   redhat_subscription:
     state: absent
   when: 
-    - unregisterreposvr == 'yes'
+    - "unregisterreposvr == 'yes'"
