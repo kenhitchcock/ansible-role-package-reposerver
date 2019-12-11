@@ -16,7 +16,12 @@ role and dont need to be set.
 
 | Variable | Description | Required | Defaults |
 |:---------|:------------|:---------|:---------|
-|reporoot| Path to the where repos will be exposed via httpd | yes | "/var/www/html/repos"|
+|reporoot| Path to the where repos will be exposed via httpd | yes |"/var/www/html/repos"|
+|repofilename|Directory name of where all repos will be stored.|yes|"custom_repos"|
+|repogpgcheck|Used to mark repos to either use or done use gpgchecks|yes|"no"|
+|unregisterreposvr|Will be used to unregister repo server from cdn or satellite|yes|"yes"|
+|PACKAGES|Dictionary of packages that will be installed by the role.|Yes|httpd,createrepo,firewalld,zip,unzip|
+|FIREWALL_SERVICES|Firewall services to open in the firewall, NOT ports for now.|yes|http,https,ssh|
 |REPOS| Dictionary of repos to build and provide, example below | yes | |
 |reposvr_filetype|accepts archive, iso for now|yes||
 |reposvr_useweb|Used to determine how files will be transfered to system|yes||

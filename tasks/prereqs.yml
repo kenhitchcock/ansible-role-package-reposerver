@@ -2,7 +2,7 @@
 
 - name: "Package installation"
   yum: 
-    name: "{{item}}"
+    name: "{{ item }}"
   loop: "{{PACKAGES}}"
 
 - name: "Check if main repository directory exists"
@@ -29,10 +29,8 @@
     permanent: yes
     state: enabled
     immediate: yes
-  with_items:
-  - http
-  - https 
-  - ssh
+  loop: "{{FIREWALL_SERVICES}}"
+
 
 
 

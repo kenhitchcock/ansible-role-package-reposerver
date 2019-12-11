@@ -17,15 +17,6 @@ REPOS:
     reposvr_repodir: "rhel7"
     reposvr_reponame: "rhel7"
 
-#  EPELRPMS:
-#    reposvr_filename: "epel.zip"
-#    reposvr_filetype: "archive"
-#    reposvr_webloc: "http://192.168.122.1/pub/rhel77/OS"
-#    reposvr_fileloc: "files/"
-#    reposvr_useweb: "yes"
-#    reposvr_repodir: "epel"
-#    reposvr_reponame: "epel"
-
 
 PACKAGES:
   - httpd
@@ -34,5 +25,8 @@ PACKAGES:
   - zip 
   - unzip
 
-
+FIREWALL_SERVICES:
+  - http
+  - https 
+  - ssh
 
